@@ -13,11 +13,13 @@ export interface AgentFeedback {
 interface AgentCardProps {
   agent: Agent;
   locale: Locale;
-  articleText: string;
   feedback: AgentFeedback | null;
   loading: boolean;
   error: string | null;
+  improveLoading: boolean;
+  hasActiveChanges: boolean;
   onUpdate: (id: string, updates: { name: string; persona: string }) => void;
+  onImprove: (agentId: string) => void;
 }
 
 function ScoreBar({ score }: { score: number }) {
@@ -56,11 +58,13 @@ function SkeletonCard() {
 export default function AgentCard({
   agent,
   locale,
-  articleText,
   feedback,
   loading,
   error,
+  improveLoading,
+  hasActiveChanges,
   onUpdate,
+  onImprove,
 }: AgentCardProps) {
   const strings = t(locale);
   const displayName = strings.agentNames[agent.id] ?? agent.name;
@@ -69,10 +73,6 @@ export default function AgentCard({
   const [draftName, setDraftName] = useState(agent.name);
   const [draftPersona, setDraftPersona] = useState(agent.persona);
 
-  const [suggestions, setSuggestions] = useState<string | null>(null);
-  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
-  const [suggestionsError, setSuggestionsError] = useState<string | null>(null);
-
   function handleEdit() {
     setDraftName(agent.name);
     setDraftPersona(agent.persona);
@@ -80,40 +80,15 @@ export default function AgentCard({
   }
 
   function handleSave() {
-    onUpdate(agent.id, { name: draftName.trim(), persona: draftPersona.trim() });
+    onUpdate(agent.id, {
+      name: draftName.trim(),
+      persona: draftPersona.trim(),
+    });
     setEditing(false);
   }
 
   function handleCancel() {
     setEditing(false);
-  }
-
-  async function handleImprove() {
-    if (!feedback || !articleText.trim()) return;
-    setSuggestionsLoading(true);
-    setSuggestionsError(null);
-    setSuggestions(null);
-    try {
-      const res = await fetch("/api/improve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: articleText,
-          persona: agent.persona,
-          feedback,
-          lang: locale,
-        }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setSuggestions(data.suggestions);
-    } catch (err) {
-      setSuggestionsError(
-        err instanceof Error ? err.message : "Unknown error"
-      );
-    } finally {
-      setSuggestionsLoading(false);
-    }
   }
 
   return (
@@ -164,7 +139,7 @@ export default function AgentCard({
       {editing && (
         <div className="space-y-2">
           <label className="text-xs text-gray-500 uppercase tracking-wide">
-            {locale === "fr" ? "Description / Persona" : "Description / Persona"}
+            Description / Persona
           </label>
           <textarea
             value={draftPersona}
@@ -240,40 +215,22 @@ export default function AgentCard({
                 </p>
               </div>
 
-              {/* Improve button + suggestions */}
-              {!suggestions && !suggestionsLoading && (
-                <button
-                  onClick={handleImprove}
-                  className="w-full mt-1 px-3 py-2 text-xs font-medium border border-gray-700 rounded-lg text-gray-400 hover:text-gray-200 hover:border-gray-500 transition-colors"
-                >
-                  {strings.howToImprove}
-                </button>
-              )}
-
-              {suggestionsLoading && (
-                <div className="space-y-2 mt-1">
-                  <div className="h-3 bg-gray-800 rounded animate-pulse-subtle" />
-                  <div className="h-3 bg-gray-800 rounded animate-pulse-subtle w-5/6" />
-                  <div className="h-3 bg-gray-800 rounded animate-pulse-subtle w-4/6" />
-                </div>
-              )}
-
-              {suggestionsError && (
-                <p className="text-sm text-red-400 mt-1">
-                  {strings.feedbackError} {suggestionsError}
-                </p>
-              )}
-
-              {suggestions && (
-                <div className="mt-1">
-                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-                    {strings.suggestions}
-                  </p>
-                  <p className="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed">
-                    {suggestions}
-                  </p>
-                </div>
-              )}
+              {/* Suggest edits button */}
+              <button
+                onClick={() => onImprove(agent.id)}
+                disabled={improveLoading || hasActiveChanges}
+                className="w-full mt-1 px-3 py-2 text-xs font-medium border rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                style={{
+                  borderColor: agent.color + "60",
+                  color: agent.color,
+                }}
+              >
+                {improveLoading
+                  ? locale === "fr"
+                    ? "Chargement..."
+                    : "Loading..."
+                  : strings.suggestEdits}
+              </button>
             </div>
           )}
 
