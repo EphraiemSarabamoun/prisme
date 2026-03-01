@@ -16,7 +16,7 @@ Every article carries blind spots. A journalist may unintentionally favor one pe
 
 Prisme puts three AI "lenses" on your writing simultaneously:
 
-Each agent scores your article (1–10), flags disagreements, and can **suggest targeted edits** that appear as an interactive diff you can accept or reject. You can also calibrate your agents by uploading folders of articles and batch-testing them to see how each agent scores across a corpus, then tweak agent personas and descriptions until they behave exactly how you want.
+Each agent scores your article (1–10), flags disagreements, and can **suggest targeted edits** that appear as an interactive diff you can accept or reject. You can also calibrate your agents by uploading folders of articles and batch-testing them to see how each agent scores across a corpus, then tweak agent personas and descriptions until they behave exactly how you want. The entire app supports light and dark mode, and is fully localized in both English and French.
 
 
 ## Powered by Mistral
