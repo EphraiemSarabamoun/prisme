@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { agents } from "@/lib/agents";
+import { defaultAgents, JSON_FORMAT_INSTRUCTION, Agent } from "@/lib/agents";
 import AgentCard, { AgentFeedback } from "@/components/AgentCard";
 import { Locale, t } from "@/lib/i18n";
 
@@ -14,16 +14,28 @@ export default function Home() {
   const [text, setText] = useState("");
   const [locale, setLocale] = useState<Locale>("en");
   const strings = t(locale);
+  const [agents, setAgents] = useState<Agent[]>(() => defaultAgents);
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(() =>
     Object.fromEntries(
-      agents.map((a) => [a.id, { data: null, loading: false, error: null }])
+      defaultAgents.map((a) => [
+        a.id,
+        { data: null, loading: false, error: null },
+      ])
     )
+  );
+
+  const handleUpdateAgent = useCallback(
+    (id: string, updates: { name: string; persona: string }) => {
+      setAgents((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...updates } : a))
+      );
+    },
+    []
   );
 
   const fetchFeedback = useCallback(async () => {
     if (!text.trim()) return;
 
-    // Set all agents to loading
     setFeedbackState((prev) =>
       Object.fromEntries(
         agents.map((a) => [
@@ -33,17 +45,16 @@ export default function Home() {
       )
     );
 
-    // Fire parallel requests
     await Promise.allSettled(
       agents.map(async (agent) => {
         try {
+          const systemPrompt =
+            agent.persona + JSON_FORMAT_INSTRUCTION + strings.langSuffix;
+
           const res = await fetch("/api/feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              text,
-              systemPrompt: agent.systemPrompt + strings.langSuffix,
-            }),
+            body: JSON.stringify({ text, systemPrompt }),
           });
 
           if (!res.ok) {
@@ -68,7 +79,7 @@ export default function Home() {
         }
       })
     );
-  }, [text, strings.langSuffix]);
+  }, [text, agents, strings.langSuffix]);
 
   const wordCount = text
     .trim()
@@ -129,6 +140,7 @@ export default function Home() {
               feedback={feedbackState[agent.id]?.data ?? null}
               loading={feedbackState[agent.id]?.loading ?? false}
               error={feedbackState[agent.id]?.error ?? null}
+              onUpdate={handleUpdateAgent}
             />
           ))}
         </aside>
