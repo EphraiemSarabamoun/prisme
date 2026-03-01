@@ -175,7 +175,7 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
         <div>
-          <h1 className="text-lg font-bold tracking-tight">LensWriter</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">Prisme</h1>
           <p className="text-xs text-gray-500">
             {strings.tagline}
             <span className="mx-1.5 text-gray-300 dark:text-gray-700">|</span>

@@ -4,8 +4,8 @@ import ThemeSync from "@/components/ThemeSync";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LensWriter",
-  description: "See your writing through every lens",
+  title: "Prisme",
+  description: "See your writing through every perspective",
 };
 
 export default function RootLayout({

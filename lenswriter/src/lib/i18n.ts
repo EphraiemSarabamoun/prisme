@@ -2,7 +2,7 @@ export type Locale = "en" | "fr";
 
 const strings = {
   en: {
-    tagline: "See your writing through every lens",
+    tagline: "See your writing through every perspective",
     word: "word",
     words: "words",
     getPerspectives: "Get Perspectives",
@@ -51,7 +51,7 @@ const strings = {
     langSuffix: "",
   },
   fr: {
-    tagline: "Voyez votre texte sous tous les angles",
+    tagline: "Voyez votre texte sous toutes les perspectives",
     word: "mot",
     words: "mots",
     getPerspectives: "Obtenir les perspectives",
