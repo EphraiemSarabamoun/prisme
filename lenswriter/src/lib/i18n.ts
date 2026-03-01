@@ -35,6 +35,7 @@ const strings = {
     noResults: "Run a test to see how your agents score these articles.",
     deleteFolder: "Delete",
     deleteArticle: "Remove",
+    closePreview: "Close",
     evaluating: "Evaluating article",
     of: "of",
     agentNames: {
@@ -78,6 +79,7 @@ const strings = {
     noResults: "Lancez un test pour voir les scores de vos agents sur ces articles.",
     deleteFolder: "Supprimer",
     deleteArticle: "Supprimer",
+    closePreview: "Fermer",
     evaluating: "Evaluation de l'article",
     of: "sur",
     agentNames: {

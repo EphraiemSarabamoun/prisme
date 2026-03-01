@@ -43,10 +43,12 @@ export default function TunePage() {
   const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [previewArticleId, setPreviewArticleId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedFolder = folders.find((f) => f.id === selectedFolderId) ?? null;
+  const previewArticle = selectedFolder?.articles.find((a) => a.id === previewArticleId) ?? null;
 
   // --- Folder management ---
 
@@ -375,7 +377,8 @@ export default function TunePage() {
                   selectedFolder.articles.map((article) => (
                     <div
                       key={article.id}
-                      className="rounded-lg border border-gray-800 bg-gray-900/50 p-3"
+                      className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 cursor-pointer hover:border-gray-700 transition-colors"
+                      onClick={() => setPreviewArticleId(article.id)}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
@@ -388,7 +391,10 @@ export default function TunePage() {
                           </p>
                         </div>
                         <button
-                          onClick={() => handleDeleteArticle(article.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteArticle(article.id);
+                          }}
                           className="text-xs text-gray-600 hover:text-red-400 shrink-0 transition-colors"
                         >
                           {strings.deleteArticle}
@@ -517,6 +523,39 @@ export default function TunePage() {
           </div>
         </div>
       </div>
+
+      {/* Article preview modal */}
+      {previewArticle && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setPreviewArticleId(null)}
+        >
+          <div
+            className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
+              <h2 className="text-sm font-semibold text-gray-200 truncate">
+                {previewArticle.filename}
+              </h2>
+              <button
+                onClick={() => setPreviewArticleId(null)}
+                className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 border border-gray-700 rounded-lg hover:bg-gray-800"
+              >
+                {strings.closePreview}
+              </button>
+            </div>
+
+            {/* Modal body */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <pre className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap font-sans">
+                {previewArticle.content}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
