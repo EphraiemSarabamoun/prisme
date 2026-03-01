@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useRef } from "react";
 import { defaultAgents, JSON_FORMAT_INSTRUCTION, Agent } from "@/lib/agents";
 import AgentCard, { AgentFeedback } from "@/components/AgentCard";
 import DiffView from "@/components/DiffView";
-import { diffWords, applyInserts } from "@/lib/diff";
+import { diffWords } from "@/lib/diff";
 import { Locale, t } from "@/lib/i18n";
 
 type FeedbackState = Record<
@@ -36,6 +36,7 @@ export default function Home() {
     null
   );
   const [improveLoadingId, setImproveLoadingId] = useState<string | null>(null);
+  const diffRef = useRef<HTMLDivElement>(null);
 
   const diffOps = useMemo(() => {
     if (!pendingChanges) return null;
@@ -140,8 +141,9 @@ export default function Home() {
   );
 
   function handleAcceptChanges() {
-    if (!pendingChanges || !diffOps) return;
-    setText(applyInserts(diffOps));
+    if (!pendingChanges) return;
+    const edited = diffRef.current?.innerText ?? "";
+    setText(edited.trim());
     setPendingChanges(null);
   }
 
@@ -226,7 +228,7 @@ export default function Home() {
         {/* Editor pane */}
         <div className="flex-1 flex flex-col border-r border-gray-800">
           {pendingChanges && diffOps ? (
-            <DiffView ops={diffOps} agentColor={pendingChanges.agentColor} />
+            <DiffView ref={diffRef} ops={diffOps} agentColor={pendingChanges.agentColor} />
           ) : (
             <textarea
               value={text}
