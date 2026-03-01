@@ -5,8 +5,10 @@ import Link from "next/link";
 import { JSON_FORMAT_INSTRUCTION } from "@/lib/agents";
 import { useAgents } from "@/lib/AgentContext";
 import AgentCard, { AgentFeedback } from "@/components/AgentCard";
+import RichEditor from "@/components/RichEditor";
 import DiffView from "@/components/DiffView";
 import { diffWords } from "@/lib/diff";
+import { stripHtml } from "@/lib/stripHtml";
 import { t } from "@/lib/i18n";
 import { useLocalStorage } from "@/lib/useLocalStorage";
 
@@ -38,7 +40,9 @@ function collectTextExcluding(node: Node, excludeDiffType: string): string {
 export default function Home() {
   const { agents, locale, setLocale, theme, setTheme } = useAgents();
   const strings = t(locale);
-  const [text, setText] = useLocalStorage("lw:editorText", "");
+  const [htmlContent, setHtmlContent] = useLocalStorage("lw:editorHtml", "");
+  const plainText = useMemo(() => stripHtml(htmlContent), [htmlContent]);
+
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(() =>
     Object.fromEntries(
       agents.map((a) => [
@@ -55,11 +59,11 @@ export default function Home() {
 
   const diffOps = useMemo(() => {
     if (!pendingChanges) return null;
-    return diffWords(text, pendingChanges.revisedText);
-  }, [text, pendingChanges]);
+    return diffWords(plainText, pendingChanges.revisedText);
+  }, [plainText, pendingChanges]);
 
   const fetchFeedback = useCallback(async () => {
-    if (!text.trim()) return;
+    if (!plainText.trim()) return;
 
     setFeedbackState((prev) =>
       Object.fromEntries(
@@ -79,7 +83,7 @@ export default function Home() {
           const res = await fetch("/api/feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, systemPrompt }),
+            body: JSON.stringify({ text: plainText, systemPrompt }),
           });
 
           if (!res.ok) {
@@ -104,13 +108,13 @@ export default function Home() {
         }
       })
     );
-  }, [text, agents, strings.langSuffix]);
+  }, [plainText, agents, strings.langSuffix]);
 
   const handleImprove = useCallback(
     async (agentId: string) => {
       const agent = agents.find((a) => a.id === agentId);
       const feedback = feedbackState[agentId]?.data;
-      if (!agent || !feedback || !text.trim()) return;
+      if (!agent || !feedback || !plainText.trim()) return;
 
       setImproveLoadingId(agentId);
 
@@ -119,7 +123,7 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text,
+            text: plainText,
             persona: agent.persona,
             feedback,
             lang: locale,
@@ -143,25 +147,25 @@ export default function Home() {
         setImproveLoadingId(null);
       }
     },
-    [agents, feedbackState, text, locale, strings.agentNames]
+    [agents, feedbackState, plainText, locale, strings.agentNames]
   );
 
   function handleAcceptChanges() {
     if (!pendingChanges) return;
     const edited = diffRef.current?.innerText ?? "";
-    setText(edited.trim());
+    setHtmlContent(`<p>${edited.trim()}</p>`);
     setPendingChanges(null);
   }
 
   function handleRejectChanges() {
     if (diffRef.current) {
       const result = collectTextExcluding(diffRef.current, "insert");
-      setText(result.trim());
+      setHtmlContent(`<p>${result.trim()}</p>`);
     }
     setPendingChanges(null);
   }
 
-  const wordCount = text
+  const wordCount = plainText
     .trim()
     .split(/\s+/)
     .filter((w) => w).length;
@@ -203,7 +207,7 @@ export default function Home() {
           </Link>
           <button
             onClick={fetchFeedback}
-            disabled={!text.trim() || !!pendingChanges}
+            disabled={!plainText.trim() || !!pendingChanges}
             className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-950 text-sm font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             {strings.getPerspectives}
@@ -261,12 +265,10 @@ export default function Home() {
               agentColor={pendingChanges.agentColor}
             />
           ) : (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
+            <RichEditor
+              content={htmlContent}
+              onUpdate={setHtmlContent}
               placeholder={strings.placeholder}
-              className="flex-1 w-full bg-transparent resize-none p-6 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-700 text-base leading-relaxed focus:outline-none"
-              spellCheck
             />
           )}
         </div>
