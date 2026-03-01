@@ -14,6 +14,8 @@ const strings = {
     emptyState:
       'Write something and click "Get Perspectives" to see feedback.',
     feedbackError: "Failed to get feedback:",
+    howToImprove: "How can I improve?",
+    suggestions: "Suggestions",
     agentNames: {
       "conservative-skeptic": "Conservative Skeptic",
       "progressive-advocate": "Progressive Advocate",
@@ -34,6 +36,8 @@ const strings = {
     emptyState:
       "Ecrivez quelque chose et cliquez sur \"Obtenir les perspectives\" pour voir les retours.",
     feedbackError: "Echec de l'obtention du retour :",
+    howToImprove: "Comment ameliorer ?",
+    suggestions: "Suggestions",
     agentNames: {
       "conservative-skeptic": "Sceptique Conservateur",
       "progressive-advocate": "Avocat Progressiste",

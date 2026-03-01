@@ -137,6 +137,7 @@ export default function Home() {
               key={agent.id}
               agent={agent}
               locale={locale}
+              articleText={text}
               feedback={feedbackState[agent.id]?.data ?? null}
               loading={feedbackState[agent.id]?.loading ?? false}
               error={feedbackState[agent.id]?.error ?? null}
