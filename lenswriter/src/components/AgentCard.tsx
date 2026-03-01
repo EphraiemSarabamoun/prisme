@@ -24,11 +24,11 @@ interface AgentCardProps {
 function SkeletonCard() {
   return (
     <div className="space-y-3">
-      <div className="h-2 bg-gray-700 rounded-full animate-pulse-subtle" />
-      <div className="h-4 bg-gray-800 rounded animate-pulse-subtle w-3/4" />
+      <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse-subtle" />
+      <div className="h-4 bg-gray-100 dark:bg-gray-800 rounded animate-pulse-subtle w-3/4" />
       <div className="space-y-2">
-        <div className="h-3 bg-gray-800 rounded animate-pulse-subtle" />
-        <div className="h-3 bg-gray-800 rounded animate-pulse-subtle w-5/6" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded animate-pulse-subtle" />
+        <div className="h-3 bg-gray-100 dark:bg-gray-800 rounded animate-pulse-subtle w-5/6" />
       </div>
     </div>
   );
@@ -48,7 +48,7 @@ export default function AgentCard({
   const displayName = strings.agentNames[agent.id] ?? agent.name;
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 space-y-3">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-900/50 p-4 space-y-3">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div
@@ -57,7 +57,7 @@ export default function AgentCard({
         >
           {agent.avatar}
         </div>
-        <h3 className="font-semibold text-sm text-gray-200">
+        <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">
           {displayName}
         </h3>
       </div>
@@ -65,7 +65,7 @@ export default function AgentCard({
       {loading && <SkeletonCard />}
 
       {error && (
-        <p className="text-sm text-red-400">
+        <p className="text-sm text-red-600 dark:text-red-400">
           {strings.feedbackError} {error}
         </p>
       )}
@@ -88,9 +88,9 @@ export default function AgentCard({
                 {feedback.key_disagreements.map((d, i) => (
                   <li
                     key={i}
-                    className="text-sm text-gray-300 flex items-start gap-2"
+                    className="text-sm text-gray-700 dark:text-gray-300 flex items-start gap-2"
                   >
-                    <span className="text-gray-600 mt-0.5 shrink-0">
+                    <span className="text-gray-400 dark:text-gray-600 mt-0.5 shrink-0">
                       &bull;
                     </span>
                     {d}
@@ -104,7 +104,7 @@ export default function AgentCard({
             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
               {strings.perspective}
             </p>
-            <p className="text-sm text-gray-300 italic">
+            <p className="text-sm text-gray-700 dark:text-gray-300 italic">
               &ldquo;{feedback.perspective_summary}&rdquo;
             </p>
           </div>
@@ -129,7 +129,7 @@ export default function AgentCard({
       )}
 
       {!feedback && !loading && !error && (
-        <p className="text-sm text-gray-600 italic">{strings.emptyState}</p>
+        <p className="text-sm text-gray-400 dark:text-gray-600 italic">{strings.emptyState}</p>
       )}
     </div>
   );

@@ -34,7 +34,7 @@ interface Folder {
 }
 
 export default function TunePage() {
-  const { agents, updateAgent, locale, setLocale } = useAgents();
+  const { agents, updateAgent, locale, setLocale, theme, setTheme } = useAgents();
   const strings = t(locale);
 
   const [folders, setFolders] = useLocalStorage<Folder[]>("lw:tuneFolders", []);
@@ -242,11 +242,11 @@ export default function TunePage() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
+      <header className="border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            className="text-gray-500 hover:text-gray-300 transition-colors text-sm"
+            className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors text-sm"
           >
             &larr; {strings.backToEditor}
           </Link>
@@ -256,25 +256,34 @@ export default function TunePage() {
             </h1>
           </div>
         </div>
-        <button
-          onClick={() => setLocale((l) => (l === "en" ? "fr" : "en"))}
-          className="px-3 py-2 border border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          {locale === "en" ? "FR" : "EN"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+          </button>
+          <button
+            onClick={() => setLocale((l) => (l === "en" ? "fr" : "en"))}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          >
+            {locale === "en" ? "FR" : "EN"}
+          </button>
+        </div>
       </header>
 
       {/* Main 3-column layout */}
       <div className="flex flex-1 min-h-0">
         {/* Folder sidebar */}
-        <div className="w-64 shrink-0 border-r border-gray-800 flex flex-col">
-          <div className="p-3 border-b border-gray-800 flex items-center justify-between">
+        <div className="w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               {strings.folders}
             </h2>
             <button
               onClick={() => setCreatingFolder(true)}
-              className="text-gray-500 hover:text-gray-300 text-lg leading-none transition-colors"
+              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-lg leading-none transition-colors"
               title={strings.newFolder}
             >
               +
@@ -295,14 +304,14 @@ export default function TunePage() {
                     }
                   }}
                   placeholder={strings.folderName}
-                  className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-sm text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-gray-500"
+                  className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1.5 text-sm text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-gray-500"
                   autoFocus
                 />
               </div>
             )}
 
             {folders.length === 0 && !creatingFolder && (
-              <p className="p-4 text-xs text-gray-600 italic">
+              <p className="p-4 text-xs text-gray-400 dark:text-gray-600 italic">
                 {strings.noFolders}
               </p>
             )}
@@ -313,15 +322,15 @@ export default function TunePage() {
                 onClick={() => setSelectedFolderId(folder.id)}
                 className={`px-3 py-2.5 cursor-pointer flex items-center justify-between group transition-colors ${
                   selectedFolderId === folder.id
-                    ? "bg-gray-800/70 border-l-2 border-white"
-                    : "hover:bg-gray-800/40 border-l-2 border-transparent"
+                    ? "bg-gray-200 dark:bg-gray-800/70 border-l-2 border-gray-900 dark:border-white"
+                    : "hover:bg-gray-100 dark:hover:bg-gray-800/40 border-l-2 border-transparent"
                 }`}
               >
                 <div className="min-w-0">
-                  <p className="text-sm text-gray-200 truncate">
+                  <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
                     {folder.name}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-gray-400 dark:text-gray-600">
                     {folder.articles.length}{" "}
                     {folder.articles.length === 1
                       ? strings.articles.toLowerCase().slice(0, -1)
@@ -333,7 +342,7 @@ export default function TunePage() {
                     e.stopPropagation();
                     handleDeleteFolder(folder.id);
                   }}
-                  className="text-gray-700 hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
+                  className="text-gray-300 dark:text-gray-700 hover:text-red-600 dark:hover:text-red-400 text-xs opacity-0 group-hover:opacity-100 transition-all shrink-0"
                 >
                   {strings.deleteFolder}
                 </button>
@@ -343,19 +352,19 @@ export default function TunePage() {
         </div>
 
         {/* Articles center panel */}
-        <div className="flex-1 flex flex-col border-r border-gray-800 min-w-0">
+        <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-800 min-w-0">
           {selectedFolder ? (
             <>
               {/* Folder header */}
-              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-                <h2 className="font-semibold text-gray-200">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                <h2 className="font-semibold text-gray-800 dark:text-gray-200">
                   {selectedFolder.name}
                 </h2>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="px-3 py-1.5 text-xs font-medium border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 disabled:opacity-30 transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 transition-colors"
                   >
                     {uploading ? "..." : strings.uploadArticle}
                   </button>
@@ -372,7 +381,7 @@ export default function TunePage() {
                     disabled={
                       isRunning || selectedFolder.articles.length === 0
                     }
-                    className="px-3 py-1.5 text-xs font-medium bg-white text-gray-950 rounded-lg hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-950 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                   >
                     {isRunning ? strings.running : strings.runTest}
                   </button>
@@ -381,7 +390,7 @@ export default function TunePage() {
 
               {/* Progress */}
               {progress && (
-                <div className="px-4 py-2 bg-gray-800/50 text-xs text-gray-400 border-b border-gray-800">
+                <div className="px-4 py-2 bg-gray-100 dark:bg-gray-800/50 text-xs text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
                   {progress}
                 </div>
               )}
@@ -390,12 +399,12 @@ export default function TunePage() {
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {selectedFolder.articles.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
-                    <p className="text-sm text-gray-600 italic">
+                    <p className="text-sm text-gray-400 dark:text-gray-600 italic">
                       {strings.noArticles}
                     </p>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="mt-3 px-4 py-2 border border-dashed border-gray-700 rounded-lg text-xs text-gray-500 hover:text-gray-300 hover:border-gray-500 transition-colors"
+                      className="mt-3 px-4 py-2 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-500 transition-colors"
                     >
                       {strings.uploadHint}
                     </button>
@@ -404,12 +413,12 @@ export default function TunePage() {
                   selectedFolder.articles.map((article) => (
                     <div
                       key={article.id}
-                      className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 cursor-pointer hover:border-gray-700 transition-colors"
+                      className="rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-900/50 p-3 cursor-pointer hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
                       onClick={() => setPreviewArticleId(article.id)}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-200 truncate">
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                             {article.filename}
                           </p>
                           <p className="text-xs text-gray-500 mt-1 line-clamp-2">
@@ -422,7 +431,7 @@ export default function TunePage() {
                             e.stopPropagation();
                             handleDeleteArticle(article.id);
                           }}
-                          className="text-xs text-gray-600 hover:text-red-400 shrink-0 transition-colors"
+                          className="text-xs text-gray-400 dark:text-gray-600 hover:text-red-600 dark:hover:text-red-400 shrink-0 transition-colors"
                         >
                           {strings.deleteArticle}
                         </button>
@@ -451,7 +460,7 @@ export default function TunePage() {
                                 >
                                   {agent.avatar}
                                 </div>
-                                <span className="text-xs font-mono text-gray-400">
+                                <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
                                   {score}/10
                                 </span>
                               </div>
@@ -466,7 +475,7 @@ export default function TunePage() {
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-gray-600 italic">
+              <p className="text-sm text-gray-400 dark:text-gray-600 italic">
                 {folders.length === 0 ? strings.noFolders : strings.noArticles}
               </p>
             </div>
@@ -475,7 +484,7 @@ export default function TunePage() {
 
         {/* Agents & Results panel */}
         <div className="w-80 shrink-0 flex flex-col">
-          <div className="p-3 border-b border-gray-800">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-800">
             <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               {strings.agents}
             </h2>
@@ -493,7 +502,7 @@ export default function TunePage() {
               return (
                 <div
                   key={agent.id}
-                  className="rounded-xl border border-gray-800 bg-gray-900/50 p-4 space-y-2"
+                  className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100/50 dark:bg-gray-900/50 p-4 space-y-2"
                 >
                   {/* Agent header */}
                   <div className="flex items-center gap-3">
@@ -507,18 +516,18 @@ export default function TunePage() {
                       <input
                         value={draftName}
                         onChange={(e) => setDraftName(e.target.value)}
-                        className="flex-1 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-gray-200 focus:outline-none focus:border-gray-500"
+                        className="flex-1 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-sm text-gray-800 dark:text-gray-200 focus:outline-none focus:border-gray-500"
                         autoFocus
                       />
                     ) : (
-                      <h3 className="font-semibold text-sm text-gray-200 truncate flex-1">
+                      <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200 truncate flex-1">
                         {displayName}
                       </h3>
                     )}
                     {!isEditing && (
                       <button
                         onClick={() => handleEditAgent(agent.id)}
-                        className="text-gray-600 hover:text-gray-400 transition-colors shrink-0"
+                        className="text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors shrink-0"
                         title={strings.editAgent}
                       >
                         <svg
@@ -543,19 +552,19 @@ export default function TunePage() {
                         value={draftPersona}
                         onChange={(e) => setDraftPersona(e.target.value)}
                         rows={6}
-                        className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-300 leading-relaxed resize-y focus:outline-none focus:border-gray-500"
+                        className="w-full bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-3 py-2 text-sm text-gray-700 dark:text-gray-300 leading-relaxed resize-y focus:outline-none focus:border-gray-500"
                       />
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={handleCancelEdit}
-                          className="px-3 py-1.5 text-xs text-gray-400 border border-gray-700 rounded-lg hover:bg-gray-800 transition-colors"
+                          className="px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                         >
                           {strings.cancel}
                         </button>
                         <button
                           onClick={handleSaveAgent}
                           disabled={!draftName.trim() || !draftPersona.trim()}
-                          className="px-3 py-1.5 text-xs text-gray-950 bg-white rounded-lg hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          className="px-3 py-1.5 text-xs text-white dark:text-gray-950 bg-gray-900 dark:bg-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                         >
                           {strings.save}
                         </button>
@@ -586,7 +595,7 @@ export default function TunePage() {
                               <span className="text-xs text-gray-500 truncate max-w-[60%]">
                                 {article.filename}
                               </span>
-                              <span className="text-xs font-mono text-gray-400">
+                              <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
                                 {score}/10
                               </span>
                             </div>
@@ -609,17 +618,17 @@ export default function TunePage() {
           onClick={() => setPreviewArticleId(null)}
         >
           <div
-            className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col mx-4"
+            className="bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col mx-4"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
-              <h2 className="text-sm font-semibold text-gray-200 truncate">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
+              <h2 className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
                 {previewArticle.filename}
               </h2>
               <button
                 onClick={() => setPreviewArticleId(null)}
-                className="text-xs text-gray-500 hover:text-gray-300 transition-colors px-3 py-1.5 border border-gray-700 rounded-lg hover:bg-gray-800"
+                className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors px-3 py-1.5 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 {strings.closePreview}
               </button>
@@ -627,7 +636,7 @@ export default function TunePage() {
 
             {/* Modal body */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
-              <pre className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap font-sans">
+              <pre className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap font-sans">
                 {previewArticle.content}
               </pre>
             </div>

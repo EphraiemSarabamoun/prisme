@@ -36,7 +36,7 @@ function collectTextExcluding(node: Node, excludeDiffType: string): string {
 }
 
 export default function Home() {
-  const { agents, locale, setLocale } = useAgents();
+  const { agents, locale, setLocale, theme, setTheme } = useAgents();
   const strings = t(locale);
   const [text, setText] = useLocalStorage("lw:editorText", "");
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(() =>
@@ -169,7 +169,7 @@ export default function Home() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
+      <header className="border-b border-gray-200 dark:border-gray-800 px-6 py-3 flex items-center justify-between shrink-0">
         <div>
           <h1 className="text-lg font-bold tracking-tight">LensWriter</h1>
           <p className="text-xs text-gray-500">{strings.tagline}</p>
@@ -179,21 +179,28 @@ export default function Home() {
             {wordCount} {wordCount === 1 ? strings.word : strings.words}
           </span>
           <button
+            onClick={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? "\u2600\uFE0F" : "\uD83C\uDF19"}
+          </button>
+          <button
             onClick={() => setLocale((l) => (l === "en" ? "fr" : "en"))}
-            className="px-3 py-2 border border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             {locale === "en" ? "FR" : "EN"}
           </button>
           <Link
             href="/tune"
-            className="px-3 py-2 border border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             {strings.tuneAgents}
           </Link>
           <button
             onClick={fetchFeedback}
             disabled={!text.trim() || !!pendingChanges}
-            className="px-4 py-2 bg-white text-gray-950 text-sm font-medium rounded-lg hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-950 text-sm font-medium rounded-lg hover:bg-gray-700 dark:hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             {strings.getPerspectives}
           </button>
@@ -214,7 +221,7 @@ export default function Home() {
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: pendingChanges.agentColor }}
             />
-            <span className="text-sm text-gray-300">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
               {strings.reviewingChanges}{" "}
               <strong style={{ color: pendingChanges.agentColor }}>
                 {pendingChanges.agentName}
@@ -224,7 +231,7 @@ export default function Home() {
           <div className="flex gap-2">
             <button
               onClick={handleRejectChanges}
-              className="px-3 py-1.5 text-xs font-medium border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium border border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               {strings.rejectAll}
             </button>
@@ -242,7 +249,7 @@ export default function Home() {
       {/* Main content */}
       <div className="flex flex-1 min-h-0">
         {/* Editor pane */}
-        <div className="flex-1 flex flex-col border-r border-gray-800">
+        <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-800">
           {pendingChanges && diffOps ? (
             <DiffView
               ref={diffRef}
@@ -254,7 +261,7 @@ export default function Home() {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder={strings.placeholder}
-              className="flex-1 w-full bg-transparent resize-none p-6 text-gray-200 placeholder:text-gray-700 text-base leading-relaxed focus:outline-none"
+              className="flex-1 w-full bg-transparent resize-none p-6 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-700 text-base leading-relaxed focus:outline-none"
               spellCheck
             />
           )}
