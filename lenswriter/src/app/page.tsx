@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef } from "react";
-import { defaultAgents, JSON_FORMAT_INSTRUCTION, Agent } from "@/lib/agents";
+import Link from "next/link";
+import { JSON_FORMAT_INSTRUCTION } from "@/lib/agents";
+import { useAgents } from "@/lib/AgentContext";
 import AgentCard, { AgentFeedback } from "@/components/AgentCard";
 import DiffView from "@/components/DiffView";
 import { diffWords } from "@/lib/diff";
-import { Locale, t } from "@/lib/i18n";
+import { t } from "@/lib/i18n";
 
 type FeedbackState = Record<
   string,
@@ -33,13 +35,12 @@ function collectTextExcluding(node: Node, excludeDiffType: string): string {
 }
 
 export default function Home() {
-  const [text, setText] = useState("");
-  const [locale, setLocale] = useState<Locale>("en");
+  const { agents, updateAgent, locale, setLocale } = useAgents();
   const strings = t(locale);
-  const [agents, setAgents] = useState<Agent[]>(() => defaultAgents);
+  const [text, setText] = useState("");
   const [feedbackState, setFeedbackState] = useState<FeedbackState>(() =>
     Object.fromEntries(
-      defaultAgents.map((a) => [
+      agents.map((a) => [
         a.id,
         { data: null, loading: false, error: null },
       ])
@@ -55,15 +56,6 @@ export default function Home() {
     if (!pendingChanges) return null;
     return diffWords(text, pendingChanges.revisedText);
   }, [text, pendingChanges]);
-
-  const handleUpdateAgent = useCallback(
-    (id: string, updates: { name: string; persona: string }) => {
-      setAgents((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, ...updates } : a))
-      );
-    },
-    []
-  );
 
   const fetchFeedback = useCallback(async () => {
     if (!text.trim()) return;
@@ -191,6 +183,12 @@ export default function Home() {
           >
             {locale === "en" ? "FR" : "EN"}
           </button>
+          <Link
+            href="/tune"
+            className="px-3 py-2 border border-gray-700 text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            {strings.tuneAgents}
+          </Link>
           <button
             onClick={fetchFeedback}
             disabled={!text.trim() || !!pendingChanges}
@@ -245,7 +243,11 @@ export default function Home() {
         {/* Editor pane */}
         <div className="flex-1 flex flex-col border-r border-gray-800">
           {pendingChanges && diffOps ? (
-            <DiffView ref={diffRef} ops={diffOps} agentColor={pendingChanges.agentColor} />
+            <DiffView
+              ref={diffRef}
+              ops={diffOps}
+              agentColor={pendingChanges.agentColor}
+            />
           ) : (
             <textarea
               value={text}
@@ -272,7 +274,7 @@ export default function Home() {
               error={feedbackState[agent.id]?.error ?? null}
               improveLoading={improveLoadingId === agent.id}
               hasActiveChanges={!!pendingChanges}
-              onUpdate={handleUpdateAgent}
+              onUpdate={updateAgent}
               onImprove={handleImprove}
             />
           ))}

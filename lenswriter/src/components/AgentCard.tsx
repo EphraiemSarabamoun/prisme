@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Agent } from "@/lib/agents";
 import { Locale, t } from "@/lib/i18n";
+import ScoreBar from "@/components/ScoreBar";
 
 export interface AgentFeedback {
   approval_score: number;
@@ -20,26 +21,6 @@ interface AgentCardProps {
   hasActiveChanges: boolean;
   onUpdate: (id: string, updates: { name: string; persona: string }) => void;
   onImprove: (agentId: string) => void;
-}
-
-function ScoreBar({ score }: { score: number }) {
-  const percentage = (score / 10) * 100;
-  const color =
-    score >= 7 ? "bg-green-500" : score >= 4 ? "bg-yellow-500" : "bg-red-500";
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-700 ${color}`}
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-      <span className="text-sm font-mono font-bold text-gray-300 w-8 text-right">
-        {score}/10
-      </span>
-    </div>
-  );
 }
 
 function SkeletonCard() {
